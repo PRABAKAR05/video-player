@@ -1,24 +1,22 @@
 import { useState } from 'react';
 import { Heart, MessageCircle, Bookmark, Share2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import axiosClient from '../api/axiosClient';
 
 export default function InteractionOverlay({ video, onCommentClick }) {
-  const [liked, setLiked] = useState(false); // In a real app, initialize from user data
+  const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(video.like_count);
   const [bookmarked, setBookmarked] = useState(false);
 
   const handleLike = async () => {
-    // Optimistic UI
     setLiked(!liked);
     setLikeCount(prev => liked ? prev - 1 : prev + 1);
 
     try {
       await axiosClient.post(`/videos/${video.id}/like`);
     } catch (error) {
-      // Revert if failed
       setLiked(!liked);
       setLikeCount(prev => liked ? prev + 1 : prev - 1);
-      console.error('Like failed', error);
     }
   };
 
@@ -28,7 +26,6 @@ export default function InteractionOverlay({ video, onCommentClick }) {
       await axiosClient.post(`/videos/${video.id}/bookmark`);
     } catch (error) {
       setBookmarked(!bookmarked);
-      console.error('Bookmark failed', error);
     }
   };
 
@@ -52,7 +49,7 @@ export default function InteractionOverlay({ video, onCommentClick }) {
       flexDirection: 'column',
       zIndex: 20
     }}>
-      <div style={iconStyle} onClick={handleLike}>
+      <motion.div style={iconStyle} onClick={handleLike} whileTap={{ scale: 0.8 }} whileHover={{ scale: 1.1 }}>
         <div style={{ 
           padding: '0.7rem', 
           backgroundColor: 'rgba(0,0,0,0.4)', 
@@ -61,12 +58,14 @@ export default function InteractionOverlay({ video, onCommentClick }) {
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-          <Heart fill={liked ? 'var(--accent-color)' : 'none'} color={liked ? 'var(--accent-color)' : 'white'} size={28} />
+          <motion.div animate={{ scale: liked ? [1, 1.2, 1] : 1 }}>
+            <Heart fill={liked ? 'var(--accent-color)' : 'none'} color={liked ? 'var(--accent-color)' : 'white'} size={28} />
+          </motion.div>
         </div>
         <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>{likeCount}</span>
-      </div>
+      </motion.div>
 
-      <div style={iconStyle} onClick={onCommentClick}>
+      <motion.div style={iconStyle} onClick={onCommentClick} whileTap={{ scale: 0.8 }} whileHover={{ scale: 1.1 }}>
         <div style={{ 
           padding: '0.7rem', 
           backgroundColor: 'rgba(0,0,0,0.4)', 
@@ -78,9 +77,9 @@ export default function InteractionOverlay({ video, onCommentClick }) {
           <MessageCircle size={28} />
         </div>
         <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>Reply</span>
-      </div>
+      </motion.div>
 
-      <div style={iconStyle} onClick={handleBookmark}>
+      <motion.div style={iconStyle} onClick={handleBookmark} whileTap={{ scale: 0.8 }} whileHover={{ scale: 1.1 }}>
         <div style={{ 
           padding: '0.7rem', 
           backgroundColor: 'rgba(0,0,0,0.4)', 
@@ -89,12 +88,14 @@ export default function InteractionOverlay({ video, onCommentClick }) {
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-          <Bookmark fill={bookmarked ? 'white' : 'none'} size={28} />
+          <motion.div animate={{ scale: bookmarked ? [1, 1.2, 1] : 1 }}>
+            <Bookmark fill={bookmarked ? 'white' : 'none'} size={28} />
+          </motion.div>
         </div>
         <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>Save</span>
-      </div>
+      </motion.div>
       
-      <div style={iconStyle}>
+      <motion.div style={iconStyle} whileTap={{ scale: 0.8 }} whileHover={{ scale: 1.1 }}>
         <div style={{ 
           padding: '0.7rem', 
           backgroundColor: 'rgba(0,0,0,0.4)', 
@@ -106,7 +107,7 @@ export default function InteractionOverlay({ video, onCommentClick }) {
           <Share2 size={28} />
         </div>
         <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>Share</span>
-      </div>
+      </motion.div>
     </div>
   );
 }
